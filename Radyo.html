@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Çevrimiçi Radyo Listem</title>
+    <style>
+        :root {
+            --bg-color: #f0f2f5;
+            --card-bg: #ffffff;
+            --text-color: #1a1a1a;
+            --border-color: #e0e0e0;
+            --item-bg: #f8f9fa;
+            --primary-color: #4a90e2;
+            --primary-hover: #357abd;
+            --playing-bg: #e8f4fd;
+            --playing-border: #4a90e2;
+        }
+
+        body.dark-mode {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-color: #f1f1f1;
+            --border-color: #333333;
+            --item-bg: #2a2a2a;
+            --primary-color: #3772ff;
+            --primary-hover: #2151c8;
+            --playing-bg: #1a2a3a;
+            --playing-border: #3772ff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .container {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            width: 550px;
+            max-width: 95vw;
+            transition: background-color 0.3s;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            margin: 0;
+            font-size: 22px;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 6px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"], input[type="url"] {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid var(--border-color);
+            background: var(--card-bg);
+            color: var(--text-color);
+            border-radius: 8px;
+            outline: none;
+            font-size: 14px;
+        }
+
+        input[type="text"]:focus, input[type="url"]:focus {
+            border-color: var(--primary-color);
+        }
+
+        button.add-btn {
+            padding: 12px 18px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        button.add-btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        li {
+            background: var(--item-bg);
+            padding: 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+
+        li.playing {
+            background: var(--playing-bg);
+            border-color: var(--playing-border);
+        }
+
+        .radio-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .radio-name {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 2px;
+            word-break: break-word;
+        }
+
+        .radio-url {
+            font-size: 11px;
+            opacity: 0.6;
+            word-break: break-all;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .control-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .play-btn {
+            background-color: #52c41a;
+            color: white;
+        }
+
+        .play-btn:hover {
+            background-color: #389e0d;
+        }
+
+        .stop-btn {
+            background-color: #ff4d4f;
+            color: white;
+        }
+
+        .stop-btn:hover {
+            background-color: #d9363e;
+        }
+
+        .delete-btn {
+            background-color: #8c8c8c;
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background-color: #595959;
+        }
+
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .volume-slider {
+            width: 60px;
+            height: 4px;
+            border-radius: 2px;
+            background: var(--border-color);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+        }
+
+        .volume-slider::-moz-range-thumb {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            border: none;
+        }
+
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+            font-size: 13px;
+            opacity: 0.8;
+        }
+
+        .clear-btn {
+            background: none;
+            border: none;
+            color: #ff4d4f;
+            cursor: pointer;
+            font-size: 12px;
+            padding: 0;
+        }
+
+        .clear-btn:hover {
+            text-decoration: underline;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #d9d9d9;
+            margin-right: 5px;
+        }
+
+        li.playing .status-indicator {
+            background-color: #52c41a;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h2>📻 Çevrimiçi Radyo Listem</h2>
+            <button class="theme-toggle" onclick="toggleTheme()">🌙 Gece Modu</button>
+        </div>
+        
+        <div class="input-group">
+            <input type="text" id="radioName" placeholder="Radyo adı (opsiyonel)">
+            <input type="url" id="radioUrl" placeholder="Stream URL (http://...)">
+            <button class="add-btn" onclick="addRadio()">Ekle</button>
+        </div>
+
+        <ul id="radioList"></ul>
+
+        <div class="footer">
+            <span id="radioCounter">0 radyo</span>
+            <button class="clear-btn" onclick="clearAll()">Tümünü Sil</button>
+        </div>
+    </div>
+
+    <!-- Tek audio elementi tüm radyolar için -->
+    <audio id="audioPlayer"></audio>
+
+    <script>
+        let currentPlayingId = null;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            loadRadios();
+            loadTheme();
+        });
+
+        function addRadio() {
+            const nameInput = document.getElementById("radioName");
+            const urlInput = document.getElementById("radioUrl");
+            
+            const name = nameInput.value.trim();
+            const url = urlInput.value.trim();
+
+            if (url === "") {
+                alert("Lütfen bir stream URL'si girin!");
+                return;
+            }
+
+            const radioName = name || "İsimsiz Radyo";
+            const radioId = Date.now();
+
+            createRadioElement(radioId, radioName, url);
+            saveRadios();
+            
+            nameInput.value = "";
+            urlInput.value = "";
+            updateUI();
+        }
+
+        function createRadioElement(id, name, url) {
+            const ul = document.getElementById("radioList");
+            const li = document.createElement("li");
+            li.dataset.id = id;
+
+            li.innerHTML = `
+                <span class="status-indicator"></span>
+                <div class="radio-info">
+                    <div class="radio-name">${escapeHtml(name)}</div>
+                    <div class="radio-url">${escapeHtml(url)}</div>
+                </div>
+                <div class="controls">
+                    <button class="control-btn play-btn" onclick="playRadio(${id}, '${escapeHtml(url)}')" title="Oynat">▶️</button>
+                    <button class="control-btn stop-btn" onclick="stopRadio()" title="Durdur">⏹️</button>
+                    <div class="volume-control">
+                        <input type="range" class="volume-slider" min="0" max="100" value="70" onchange="changeVolume(this.value)" title="Ses Seviyesi">
+                    </div>
+                    <button class="control-btn delete-btn" onclick="removeRadio(${id})" title="Sil">🗑️</button>
+                </div>
+            `;
+
+            ul.appendChild(li);
+        }
+
+        function playRadio(id, url) {
+            const audio = document.getElementById("audioPlayer");
+            
+            // Önceki çalan radyoyu durdur
+            if (currentPlayingId !== null && currentPlayingId !== id) {
+                stopRadio();
+            }
+
+            audio.src = url;
+            audio.play()
+                .then(() => {
+                    currentPlayingId = id;
+                    updatePlayingUI();
+                })
+                .catch(error => {
+                    alert("Radyo oynatılamadı. Lütfen URL'yi kontrol edin.\n\nHata: " + error.message);
+                });
+        }
+
+        function stopRadio() {
+            const audio = document.getElementById("audioPlayer");
+            audio.pause();
+            audio.currentTime = 0;
+            audio.src = "";
+            currentPlayingId = null;
+            updatePlayingUI();
+        }
+
+        function changeVolume(value) {
+            const audio = document.getElementById("audioPlayer");
+            audio.volume = value / 100;
+            
+            // Tüm slider'ları senkronize et
+            document.querySelectorAll(".volume-slider").forEach(slider => {
+                slider.value = value;
+            });
+        }
+
+        function removeRadio(id) {
+            const li = document.querySelector(`li[data-id="${id}"]`);
+            if (li) {
+                // Eğer silinen radyo çalıyorsa, önce durdur
+                if (currentPlayingId === id) {
+                    stopRadio();
+                }
+                li.remove();
+                saveRadios();
+                updateUI();
+            }
+        }
+
+        function clearAll() {
+            if (confirm("Tüm radyoları silmek istediğinizden emin misiniz?")) {
+                stopRadio();
+                document.getElementById("radioList").innerHTML = "";
+                saveRadios();
+                updateUI();
+            }
+        }
+
+        function updatePlayingUI() {
+            document.querySelectorAll("#radioList li").forEach(li => {
+                const id = parseInt(li.dataset.id);
+                if (id === currentPlayingId) {
+                    li.classList.add("playing");
+                } else {
+                    li.classList.remove("playing");
+                }
+            });
+        }
+
+        function updateUI() {
+            const listItems = document.querySelectorAll("#radioList li");
+            document.getElementById("radioCounter").innerText = `${listItems.length} radyo`;
+        }
+
+        function saveRadios() {
+            const radios = [];
+            const listItems = document.querySelectorAll("#radioList li");
+            
+            listItems.forEach(li => {
+                const id = li.dataset.id;
+                const name = li.querySelector(".radio-name").innerText;
+                const url = li.querySelector(".radio-url").innerText;
+                radios.push({ id, name, url });
+            });
+
+            localStorage.setItem("myRadioList", JSON.stringify(radios));
+        }
+
+        function loadRadios() {
+            const saved = localStorage.getItem("myRadioList");
+            if (!saved) return;
+
+            const radios = JSON.parse(saved);
+            radios.forEach(radio => {
+                createRadioElement(radio.id, radio.name, radio.url);
+            });
+            updateUI();
+            
+            // Varsayılan ses seviyesi
+            const audio = document.getElementById("audioPlayer");
+            audio.volume = 0.7;
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle("dark-mode");
+            const isDark = document.body.classList.contains("dark-mode");
+            
+            const btn = document.querySelector(".theme-toggle");
+            btn.innerText = isDark ? "☀️ Gündüz Modu" : "🌙 Gece Modu";
+            
+            localStorage.setItem("myRadioTheme", isDark ? "dark" : "light");
+        }
+
+        function loadTheme() {
+            const savedTheme = localStorage.getItem("myRadioTheme");
+            if (savedTheme === "dark") {
+                document.body.classList.add("dark-mode");
+                document.querySelector(".theme-toggle").innerText = "☀️ Gündüz Modu";
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Enter tuşu ile ekleme
+        document.getElementById("radioUrl").addEventListener("keypress", (e) => {
+            if (e.key === "Enter") addRadio();
+        });
+
+        document.getElementById("radioName").addEventListener("keypress", (e) => {
+            if (e.key === "Enter") document.getElementById("radioUrl").focus();
+        });
+    </script>
+
+</body>
+</html>
